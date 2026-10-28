@@ -1,0 +1,36 @@
+name: Panda World Build and Package
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-pack:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. سحب كود المشروع من المستودع
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. إعداد بيئة العمل (مثلاً .NET أو Java حسب الحاجة)
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3. ضغط وتجميع ملفات المشروع في مجلد ZIP واحد
+      - name: Create Project ZIP Archive
+        run: |
+          mkdir -p output_package
+          zip -r output_package/PandaCommunicationWorld_Package.zip . -x ".git/*" ".github/*"
+          ls -la output_package
+
+      # 4. رفع الملف المضغوط كـ Artifact ليكون جاهزاً للتحميل المباشر من جيثب
+      - name: Upload Package Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PandaCommunicationWorld-Release
+          path: output_package/PandaCommunicationWorld_Package.zip
